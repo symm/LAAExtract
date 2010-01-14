@@ -1,4 +1,4 @@
-Drop your binaries in same dir and run the script, it should produce the missing files:
+Copy the game excutables into same directory as the script and run, it will extract the missing files for each game you own:
 
 1875b90fade138c9253a8e967007031a *00.LFL
 5d88b9d6a88e6f8e90cded9d01b7f082 *000.LFL
@@ -6,6 +6,6 @@ Drop your binaries in same dir and run the script, it should produce the missing
 d8323015ecb8b10bf53474f6e6b0ae33 *DIG.LA0
 
 TODO: 
-Loom audio (CDDA.SOU) needs converting
+Loom audio (CDDA.SOU) format needs to be identified and converted
 http://forum.scummvm.org/viewtopic.php?t=7783
 http://www.lucasforums.com/showthread.php?t=199769
