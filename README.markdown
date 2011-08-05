@@ -1,16 +1,33 @@
 LAAExtract
 ==========
 
-Purchased the LucasArts Adventure Pack on Steam? Want to play your purchase in ScummVM? Look no further.
+This tool will help you run the Steam version of [**LucasArts Adventure Pack**](http://store.steampowered.com/sub/2102/) in [**ScummVM**](http://www.scummvm.org/) by
+extracting the missing files.
 
-Copy the games to /opt/scummvm-games/ or modify the path to point to your steamapps common folder and run the script; it will extract the missing files for each game you own.
+
+How to use
+----------
+
+MacOS: simply run `./extract`
+
+Linux: run `./extract </path/to/steam apps/common>`
+
+Windows: Make sure you have [Python for Windows extensions](http://sourceforge.net/projects/pywin32/) installed. Choose your Steam Apps directory in the popup dialog
+
+
+Checksums
+---------
 
     1875b90fade138c9253a8e967007031a *00.LFL  
     5d88b9d6a88e6f8e90cded9d01b7f082 *000.LFL  
     182344899c2e2998fca0bebcd82aa81a *ATLANTIS.000  
     d8323015ecb8b10bf53474f6e6b0ae33 *DIG.LA0
 
-TODO: 
-Loom audio (CDDA.SOU) format needs to be identified and converted
-http://forum.scummvm.org/viewtopic.php?t=7783
-http://www.lucasforums.com/showthread.php?t=199769
+TODO
+----
++ Code needs refactoring  
++ Auto detect SteamApps folder in Windows
++ Loom audio (CDDA.SOU) format needs to be identified and converted 
+[more](http://forum.scummvm.org/viewtopic.php?t=7783) 
+info
+[here](http://www.lucasforums.com/showthread.php?t=199769)
