@@ -23,6 +23,11 @@ Checksums
     182344899c2e2998fca0bebcd82aa81a *ATLANTIS.000  
     d8323015ecb8b10bf53474f6e6b0ae33 *DIG.LA0
 
+Thanks
+------
+
+[somaen](https://github.com/somaen) for the offset in MacOS version of "Fate of Atlantis"
+
 TODO
 ----
 + Code needs refactoring  
