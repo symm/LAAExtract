@@ -2,7 +2,7 @@ LAAExtract
 ==========
 
 This tool will help you run the Steam version of [**LucasArts Adventure Pack**](http://store.steampowered.com/sub/2102/) in [**ScummVM**](http://www.scummvm.org/) by
-extracting the missing files.
+extracting the missing files and converting Loom audio (CDDA.SOU).
 
 
 How to use
@@ -28,11 +28,10 @@ Thanks
 
 [somaen](https://github.com/somaen) for the offset in MacOS version of "Fate of Atlantis"
 
+apprentice_fu for figuring out the format of CDDA.SOU
+
 TODO
 ----
 + Code needs refactoring  
 + Auto detect SteamApps folder in Windows
-+ Loom audio (CDDA.SOU) format needs to be identified and converted 
-[more](http://forum.scummvm.org/viewtopic.php?t=7783) 
-info
-[here](http://www.lucasforums.com/showthread.php?t=199769)
++ Testing of CDDA.SOU conversion in Windows
