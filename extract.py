@@ -128,73 +128,74 @@ def extract_game_data(extract_information, steam_path, destination_directory):
     extract_checksum = zlib.crc32(extract) & 0xffffffff
     f.close()
 
-    if "%x" % extract_checksum == extract_information['checksum']:
-        if not os.path.exists(destination_directory + '/' + extract_information['destination_dir']):
-            os.mkdir(destination_directory + '/' + extract_information['destination_dir'])
-        target = destination_directory + '/' + \
-            extract_information['destination_dir'] + '/' + extract_information['destination_file']
-        r = open(target, "wb")
-
-        if extract_information['name'] == 'Loom Audio':
-            r.write(struct.pack('BBBB', 0x52, 0x49, 0x46, 0x46))
-            r.write(struct.pack('I', 579123588))
-            r.write(struct.pack('BBBB', 0x57, 0x41, 0x56, 0x45))
-            r.write(struct.pack('BBBB', 0x66, 0x6D, 0x74, 0x20))
-            r.write(struct.pack('BBBB', 16, 0, 0, 0))
-            r.write(struct.pack('BB', 1, 0))
-            r.write(struct.pack('BB', 2, 0))
-            r.write(struct.pack('I', 44100))
-            r.write(struct.pack('I', 176400))
-            r.write(struct.pack('BB', 4, 0))
-            r.write(struct.pack('BB', 16, 0))
-            r.write(struct.pack('BBBB', 0x64, 0x61, 0x74, 0x61))
-            r.write(struct.pack('I', 579123552))
-            frame = 0
-            new_extract = ""
-            print 'Extracting Loom audio, process takes several minutes...'
-            data = enumerate(extract)
-            for byte in data:
-                if not (byte[0] % 1177):
-                    frame += 1
-                    bits = (ord(b) for b in byte[1])
-                    for b in bits:
-                        lshift = b >> 4
-                    bits = (ord(b) for b in byte[1])
-                    for b in bits:
-                        rshift = b & 0x0F
-                else:
-                    if (byte[0] %
-                        2 == 0 and frame %
-                        2 == 0) or (byte[0] %
-                                    2 == 1 and frame %
-                                    2 == 1):
-                        shift_by = lshift
-                    else:
-                        shift_by = rshift
-                    new_byte = struct.unpack('b', byte[1])[0]
-                    new_byte = new_byte << shift_by
-                    if(new_byte & 0x8):
-                        new_byte = -0x0 + new_byte
-                    new_extract += struct.pack('<h', new_byte)
-                if frame % 2000 == 0:
-                    sys.stdout.write(
-                        "%s %s %s\r" %
-                        ("Frame", frame, "of 246227."))
-                    sys.stdout.flush()
-            sys.stdout.write("\n")
-            sys.stdout.flush()
-            extract = new_extract
-            extract_information['checksum'] = 'e9dee869'
-
-        r.write(extract)
-        r.close()
-        print ("Found and wrote to disk: %s (%s)"
-               % (target, extract_information['checksum']))
-    else:
+    if "%x" % extract_checksum != extract_information['checksum']:
         print ("Unable to extract %s from %s"
                % (extract_information['destination_file'], game_binary))
         print ("(checksum %x didn't match %s)"
                % (extract_checksum, extract_information['checksum']))
+        return False
+
+    if not os.path.exists(destination_directory + '/' + extract_information['destination_dir']):
+        os.mkdir(destination_directory + '/' + extract_information['destination_dir'])
+    target = destination_directory + '/' + \
+        extract_information['destination_dir'] + '/' + extract_information['destination_file']
+    r = open(target, "wb")
+
+    if extract_information['name'] == 'Loom Audio':
+        r.write(struct.pack('BBBB', 0x52, 0x49, 0x46, 0x46))
+        r.write(struct.pack('I', 579123588))
+        r.write(struct.pack('BBBB', 0x57, 0x41, 0x56, 0x45))
+        r.write(struct.pack('BBBB', 0x66, 0x6D, 0x74, 0x20))
+        r.write(struct.pack('BBBB', 16, 0, 0, 0))
+        r.write(struct.pack('BB', 1, 0))
+        r.write(struct.pack('BB', 2, 0))
+        r.write(struct.pack('I', 44100))
+        r.write(struct.pack('I', 176400))
+        r.write(struct.pack('BB', 4, 0))
+        r.write(struct.pack('BB', 16, 0))
+        r.write(struct.pack('BBBB', 0x64, 0x61, 0x74, 0x61))
+        r.write(struct.pack('I', 579123552))
+        frame = 0
+        new_extract = ""
+        print 'Extracting Loom audio, process takes several minutes...'
+        data = enumerate(extract)
+        for byte in data:
+            if not (byte[0] % 1177):
+                frame += 1
+                bits = (ord(b) for b in byte[1])
+                for b in bits:
+                    lshift = b >> 4
+                bits = (ord(b) for b in byte[1])
+                for b in bits:
+                    rshift = b & 0x0F
+            else:
+                if (byte[0] %
+                    2 == 0 and frame %
+                    2 == 0) or (byte[0] %
+                                2 == 1 and frame %
+                                2 == 1):
+                    shift_by = lshift
+                else:
+                    shift_by = rshift
+                new_byte = struct.unpack('b', byte[1])[0]
+                new_byte = new_byte << shift_by
+                if(new_byte & 0x8):
+                    new_byte = -0x0 + new_byte
+                new_extract += struct.pack('<h', new_byte)
+            if frame % 2000 == 0:
+                sys.stdout.write(
+                    "%s %s %s\r" %
+                    ("Frame", frame, "of 246227."))
+                sys.stdout.flush()
+        sys.stdout.write("\n")
+        sys.stdout.flush()
+        extract = new_extract
+        extract_information['checksum'] = 'e9dee869'
+
+    r.write(extract)
+    r.close()
+    print ("Found and wrote to disk: %s (%s)"
+           % (target, extract_information['checksum']))
 
 if __name__ == "__main__":
     print "LAAExtract v0.3"
