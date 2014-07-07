@@ -114,28 +114,28 @@ mac = {
 }
 
 
-def extract(game, path, destination):
-    game_binary = "%s/%s/%s" % (path,
-                                game['source_dir'],
-                                game['source_binary'])
+def extract_game_data(extract_information, steam_path, destination_directory):
+    game_binary = "%s/%s/%s" % (steam_path,
+                                extract_information['source_dir'],
+                                extract_information['source_binary'])
     if not os.path.isfile(game_binary):
-        print "ERROR: Unable to extract %s because (%s) is missing" % (game['name'], game_binary)
+        print "ERROR: Unable to extract %s because (%s) is missing" % (extract_information['name'], game_binary)
         return False
 
     f = open(game_binary, "rb")
-    f.seek(game['offset'])
-    extract = f.read(game['size'])
+    f.seek(extract_information['offset'])
+    extract = f.read(extract_information['size'])
     extract_checksum = zlib.crc32(extract) & 0xffffffff
     f.close()
 
-    if "%x" % extract_checksum == game['checksum']:
-        if not os.path.exists(destination + '/' + game['destination_dir']):
-            os.mkdir(destination + '/' + game['destination_dir'])
-        target = destination + '/' + \
-            game['destination_dir'] + '/' + game['destination_file']
+    if "%x" % extract_checksum == extract_information['checksum']:
+        if not os.path.exists(destination_directory + '/' + extract_information['destination_dir']):
+            os.mkdir(destination_directory + '/' + extract_information['destination_dir'])
+        target = destination_directory + '/' + \
+            extract_information['destination_dir'] + '/' + extract_information['destination_file']
         r = open(target, "wb")
 
-        if game['name'] == 'Loom Audio':
+        if extract_information['name'] == 'Loom Audio':
             r.write(struct.pack('BBBB', 0x52, 0x49, 0x46, 0x46))
             r.write(struct.pack('I', 579123588))
             r.write(struct.pack('BBBB', 0x57, 0x41, 0x56, 0x45))
@@ -150,7 +150,7 @@ def extract(game, path, destination):
             r.write(struct.pack('BBBB', 0x64, 0x61, 0x74, 0x61))
             r.write(struct.pack('I', 579123552))
             frame = 0
-            newExtract = ""
+            new_extract = ""
             print 'Extracting Loom audio, process takes several minutes...'
             data = enumerate(extract)
             for byte in data:
@@ -168,14 +168,14 @@ def extract(game, path, destination):
                         2 == 0) or (byte[0] %
                                     2 == 1 and frame %
                                     2 == 1):
-                        shiftBy = lshift
+                        shift_by = lshift
                     else:
-                        shiftBy = rshift
-                    newByte = struct.unpack('b', byte[1])[0]
-                    newByte = newByte << shiftBy
-                    if(newByte & 0x8):
-                        newByte = -0x0 + newByte
-                    newExtract += struct.pack('<h', newByte)
+                        shift_by = rshift
+                    new_byte = struct.unpack('b', byte[1])[0]
+                    new_byte = new_byte << shift_by
+                    if(new_byte & 0x8):
+                        new_byte = -0x0 + new_byte
+                    new_extract += struct.pack('<h', new_byte)
                 if frame % 2000 == 0:
                     sys.stdout.write(
                         "%s %s %s\r" %
@@ -183,18 +183,18 @@ def extract(game, path, destination):
                     sys.stdout.flush()
             sys.stdout.write("\n")
             sys.stdout.flush()
-            extract = newExtract
-            game['checksum'] = 'e9dee869'
+            extract = new_extract
+            extract_information['checksum'] = 'e9dee869'
 
         r.write(extract)
         r.close()
         print ("Found and wrote to disk: %s (%s)"
-               % (target, game['checksum']))
+               % (target, extract_information['checksum']))
     else:
         print ("Unable to extract %s from %s"
-               % (game['destination_file'], game_binary))
+               % (extract_information['destination_file'], game_binary))
         print ("(checksum %x didn't match %s)"
-               % (extract_checksum, game['checksum']))
+               % (extract_checksum, extract_information['checksum']))
 
 if __name__ == "__main__":
     print "LAAExtract v0.3"
@@ -203,15 +203,12 @@ if __name__ == "__main__":
         home_dir = os.path.expanduser("~")
 
         if len(sys.argv) > 1:
-            # User specified Steam Directory
             print "Using steam directory: %s" % sys.argv[1]
             source = sys.argv[1]
         elif sys.platform == "darwin":
-            # on Mac with no dir specified we can Auto-detect
             source = home_dir + \
                 "/Library/Application Support/Steam/SteamApps/common"
         else:
-            # no directory specified
             print "Usage: %s <path>" % sys.argv[0]
             print "Where <path> is your SteamApps/common folder"
             exit(1)
@@ -220,22 +217,19 @@ if __name__ == "__main__":
             print "ERROR: Could not find your steam app folder at %s" % source
             exit(1)
 
-        # Create dest folder to dump our extacts to
         destination = home_dir + "/LAAextract"
         if not os.path.exists(destination):
             os.mkdir(destination)
         print "Your loot will be dropped in " + destination + ' :)'
 
-        # Do the business
         if sys.platform == "darwin":
             for game in mac:
-                extract(mac[game], source, destination)
+                extract_game_data(mac[game], source, destination)
         else:
             for game in pc:
-                extract(pc[game], source, destination)
+                extract_game_data(pc[game], source, destination)
 
     elif sys.platform == "win32" or sys.platform == "cygwin":
-        # Win32 gets a Dialog box
         import win32gui
         from win32com.shell import shell, shellcon
         desktop_pidl = shell.SHGetFolderLocation(
@@ -252,7 +246,7 @@ if __name__ == "__main__":
             None
         )
         for game in pc:
-            extract(
+            extract_game_data(
                 pc[game],
                 shell.SHGetPathFromIDList(pidl),
                 shell.SHGetPathFromIDList(pidl))
