@@ -150,19 +150,6 @@ def extract_game_data(extract_information, steam_path, destination_directory):
 
     if extract_information['name'] == 'Loom Audio':
         print 'Extracting Loom audio, process takes several minutes...'
-        r.write(struct.pack('BBBB', 0x52, 0x49, 0x46, 0x46))
-        r.write(struct.pack('I', 579123588))
-        r.write(struct.pack('BBBB', 0x57, 0x41, 0x56, 0x45))
-        r.write(struct.pack('BBBB', 0x66, 0x6D, 0x74, 0x20))
-        r.write(struct.pack('BBBB', 16, 0, 0, 0))
-        r.write(struct.pack('BB', 1, 0))
-        r.write(struct.pack('BB', 2, 0))
-        r.write(struct.pack('I', 44100))
-        r.write(struct.pack('I', 176400))
-        r.write(struct.pack('BB', 4, 0))
-        r.write(struct.pack('BB', 16, 0))
-        r.write(struct.pack('BBBB', 0x64, 0x61, 0x74, 0x61))
-        r.write(struct.pack('I', 579123552))
         extract = extract_loom_audio(extract)
         # TODO: check datafile. should have crc32 e9dee869
 
@@ -173,11 +160,24 @@ def extract_game_data(extract_information, steam_path, destination_directory):
 
 
 def extract_loom_audio(extract):
-    frame = 0
     new_extract = ""
-    data = enumerate(extract)
+    new_extract += struct.pack('BBBB', 0x52, 0x49, 0x46, 0x46)
+    new_extract += struct.pack('I', 579123588)
+    new_extract += struct.pack('BBBB', 0x57, 0x41, 0x56, 0x45)
+    new_extract += struct.pack('BBBB', 0x66, 0x6D, 0x74, 0x20)
+    new_extract += struct.pack('BBBB', 16, 0, 0, 0)
+    new_extract += struct.pack('BB', 1, 0)
+    new_extract += struct.pack('BB', 2, 0)
+    new_extract += struct.pack('I', 44100)
+    new_extract += struct.pack('I', 176400)
+    new_extract += struct.pack('BB', 4, 0)
+    new_extract += struct.pack('BB', 16, 0)
+    new_extract += struct.pack('BBBB', 0x64, 0x61, 0x74, 0x61)
+    new_extract += struct.pack('I', 579123552)
 
-    for byte in data:
+    frame = 0
+
+    for byte in enumerate(extract):
         if not (byte[0] % 1177):
             frame += 1
             bits = (ord(b) for b in byte[1])
